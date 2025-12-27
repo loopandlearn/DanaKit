@@ -364,7 +364,7 @@ extension DanaKitPumpManager: PumpManager {
                             this,
                             hasNewPumpEvents: events,
                             lastReconciliation: this.state.lastStatusDate,
-                            replacePendingEvents: true,
+                            replacePendingEvents: true
                         ) { error in
                             if let error = error {
                                 this.handlePumpDelegateError(method: "hasNewPumpEvents", error)
@@ -373,7 +373,7 @@ extension DanaKitPumpManager: PumpManager {
                         delegate.pumpManager(
                             this,
                             didReadReservoirValue: this.state.reservoirLevel,
-                            at: this.state.lastStatusDate,
+                            at: this.state.lastStatusDate
                         ) { result in
                             switch result {
                             case let .failure(error):
@@ -722,7 +722,7 @@ extension DanaKitPumpManager: PumpManager {
                                     this,
                                     hasNewPumpEvents: [event],
                                     lastReconciliation: this.state.lastStatusDate,
-                                    replacePendingEvents: false,
+                                    replacePendingEvents: false
                                 ) { error in
                                     if let error = error {
                                         this.handlePumpDelegateError(method: "hasNewPumpEvents", error)
@@ -867,7 +867,7 @@ extension DanaKitPumpManager: PumpManager {
                     self,
                     hasNewPumpEvents: [NewPumpEvent.bolus(dose: dose, units: dose.deliveredUnits ?? 0, date: dose.startDate)],
                     lastReconciliation: self.state.lastStatusDate,
-                    replacePendingEvents: true,
+                    replacePendingEvents: true
                 ) { error in
                     if let error = error {
                         self.handlePumpDelegateError(method: "hasNewPumpEvents", error)
@@ -1165,7 +1165,7 @@ extension DanaKitPumpManager: PumpManager {
                 self,
                 hasNewPumpEvents: events,
                 lastReconciliation: self.state.lastStatusDate,
-                replacePendingEvents: true,
+                replacePendingEvents: true
             ) { error in
                 if let error = error {
                     self.handlePumpDelegateError(method: "hasNewPumpEvents", error)
@@ -1227,7 +1227,7 @@ extension DanaKitPumpManager: PumpManager {
                                 this,
                                 hasNewPumpEvents: events,
                                 lastReconciliation: this.state.lastStatusDate,
-                                replacePendingEvents: true,
+                                replacePendingEvents: true
                             ) { error in
                                 if let error = error {
                                     this.handlePumpDelegateError(method: "hasNewPumpEvents", error)
@@ -1298,7 +1298,7 @@ extension DanaKitPumpManager: PumpManager {
                                 this,
                                 hasNewPumpEvents: [NewPumpEvent.resume(dose: dose)],
                                 lastReconciliation: this.state.lastStatusDate,
-                                replacePendingEvents: true,
+                                replacePendingEvents: true
                             ) { error in
                                 if let error = error {
                                     this.handlePumpDelegateError(method: "hasNewPumpEvents", error)
@@ -1394,7 +1394,7 @@ extension DanaKitPumpManager: PumpManager {
                                 this,
                                 hasNewPumpEvents: events,
                                 lastReconciliation: this.state.lastStatusDate,
-                                replacePendingEvents: true,
+                                replacePendingEvents: true
                             ) { error in
                                 if let error = error {
                                     this.handlePumpDelegateError(method: "hasNewPumpEvents", error)
@@ -1732,7 +1732,7 @@ public extension DanaKitPumpManager {
                 self,
                 hasNewPumpEvents: events,
                 lastReconciliation: self.state.lastStatusDate,
-                replacePendingEvents: true,
+                replacePendingEvents: true
             ) { error in
                 if let error = error {
                     self.handlePumpDelegateError(method: "hasNewPumpEvents", error)
@@ -1860,7 +1860,7 @@ public extension DanaKitPumpManager {
                 delegate.pumpManager(
                     self,
                     didReadReservoirValue: self.state.reservoirLevel,
-                    at: self.state.lastStatusDate,
+                    at: self.state.lastStatusDate
                 ) { result in
                     switch result {
                     case let .failure(error):
@@ -1873,7 +1873,7 @@ public extension DanaKitPumpManager {
                     self,
                     hasNewPumpEvents: events,
                     lastReconciliation: self.state.lastStatusDate,
-                    replacePendingEvents: true,
+                    replacePendingEvents: true
                 ) { error in
                     if let error = error {
                         self.handlePumpDelegateError(method: "hasNewPumpEvents", error)
@@ -1913,7 +1913,7 @@ public extension DanaKitPumpManager {
                     absoluteUnit: unitsPerHour,
                     duration: duration,
                     insulinType: state.insulinType,
-                    startDate: state.basalDeliveryDate,
+                    startDate: state.basalDeliveryDate
                 )
             ))
         }
@@ -1934,7 +1934,7 @@ public extension DanaKitPumpManager {
                 self,
                 hasNewPumpEvents: events,
                 lastReconciliation: self.state.lastStatusDate,
-                replacePendingEvents: true,
+                replacePendingEvents: true
             ) { error in
                 if let error = error {
                     self.handlePumpDelegateError(method: "hasNewPumpEvents", error)
