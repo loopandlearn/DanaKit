@@ -271,7 +271,7 @@ class DanaKitSettingsViewModel: ObservableObject {
         isUpdatingPumpState = true
 
         // Stop temp basal
-        pumpManager.enactTempBasal(unitsPerHour: 0, for: 0, completion: { error in
+        pumpManager.enactTempBasal(decisionId: nil, unitsPerHour: 0, for: 0, completion: { error in
             DispatchQueue.main.async {
                 self.isUpdatingPumpState = false
             }

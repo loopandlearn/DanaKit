@@ -66,7 +66,7 @@ extension DanaKitPumpManager: PumpManagerUI {
         UIImage(named: state.getDanaPumpImageName(), in: Bundle(for: DanaKitHUDProvider.self), compatibleWith: nil)
     }
 
-    public var pumpStatusHighlight: DeviceStatusHighlight? {
+    public var pumpStatusHighlight: PumpStatusHighlight? {
         buildPumpStatusHighlight()
     }
 
@@ -99,7 +99,7 @@ extension DanaKitPumpManager {
         }
     }
 
-    private func buildPumpStatusHighlight() -> DeviceStatusHighlight? {
+    private func buildPumpStatusHighlight() -> PumpStatusHighlight? {
         if state.reservoirLevel < 1 {
             return PumpStatusHighlight(
                 localizedMessage: String(localized: "No Insulin", comment: "Status highlight that a pump is out of insulin."),
@@ -116,10 +116,7 @@ extension DanaKitPumpManager {
                 imageName: "pause.circle.fill",
                 state: .warning
             )
-        } else if ((bluetooth as? ContinousBluetoothManager) != nil) && !bluetooth
-            .isConnected || ((bluetooth as? InteractiveBluetoothManager) != nil) && Date.now
-            .timeIntervalSince(state.lastStatusDate) > .minutes(12)
-        {
+        } else if inSignalLoss {
             return PumpStatusHighlight(
                 localizedMessage: String(
                     localized:

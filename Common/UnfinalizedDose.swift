@@ -118,6 +118,7 @@ public class UnfinalizedDose: NSObject {
                 endDate: endDate,
                 value: value,
                 unit: .units,
+                decisionId: nil,
                 deliveredUnits: isMutable ? nil : deliveredUnits,
                 insulinType: insulinType,
                 automatic: automatic,
@@ -130,6 +131,7 @@ public class UnfinalizedDose: NSObject {
                 startDate: startDate,
                 value: roundBasalRate(value),
                 unit: .unitsPerHour,
+                decisionId: nil,
                 insulinType: insulinType
             )
 
@@ -150,6 +152,7 @@ public class UnfinalizedDose: NSObject {
                 endDate: actualEndDate,
                 value: value,
                 unit: .unitsPerHour,
+                decisionId: nil,
                 deliveredUnits: isMutable ? nil : roundBasalRate(value * (duration / .hours(1))),
                 insulinType: insulinType,
                 automatic: automatic,

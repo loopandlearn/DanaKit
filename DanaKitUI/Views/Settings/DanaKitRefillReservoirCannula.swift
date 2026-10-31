@@ -41,11 +41,14 @@ struct DanaKitRefillReservoirAndCannulaView: View {
                     }
 
                     if self.isEditingReservoirAmount {
-                        ResizeablePicker(
-                            selection: $viewModel.reservoirAmount,
-                            data: Array(0 ... 60).map({ $0 * 5 }),
-                            formatter: { value in "\(value)\(self.unitText)" }
-                        )
+                        Picker(selection: $viewModel.reservoirAmount) {
+                            ForEach(Array(0 ... 60).map({ $0 * 5 }), id: \.self) { value in
+                                Text("\(value)\(self.unitText)")
+                            }
+                        } label: {
+                            EmptyView()
+                        }
+                        .pickerStyle(.wheel)
                         .padding(.horizontal)
                     }
 
@@ -85,11 +88,14 @@ struct DanaKitRefillReservoirAndCannulaView: View {
                     }
 
                     if self.isEditingTubeRefillAmount {
-                        ResizeablePicker(
-                            selection: $viewModel.tubeAmount,
-                            data: Array(0 ... 150).map({ Double($0) / 10 }),
-                            formatter: { value in "\(value)\(self.unitText)" }
-                        )
+                        Picker(selection: $viewModel.tubeAmount) {
+                            ForEach(Array(0 ... 150).map({ Double($0) / 10 }), id: \.self) { value in
+                                Text("\(value)\(self.unitText)")
+                            }
+                        } label: {
+                            EmptyView()
+                        }
+                        .pickerStyle(.wheel)
                         .padding(.horizontal)
                     }
 
@@ -138,11 +144,14 @@ struct DanaKitRefillReservoirAndCannulaView: View {
                     }
 
                     if self.isEditingPrimeRefillAmount {
-                        ResizeablePicker(
-                            selection: $viewModel.primeAmount,
-                            data: Array(0 ... 20).map({ Double($0) / 10 }),
-                            formatter: { value in "\(value)\(self.unitText)" }
-                        )
+                        Picker(selection: $viewModel.primeAmount) {
+                            ForEach(Array(0 ... 20).map({ Double($0) / 10 }), id: \.self) { value in
+                                Text("\(value)\(self.unitText)")
+                            }
+                        } label: {
+                            EmptyView()
+                        }
+                        .pickerStyle(.wheel)
                         .padding(.horizontal)
                     }
 

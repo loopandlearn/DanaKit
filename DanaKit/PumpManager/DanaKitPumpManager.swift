@@ -1,5 +1,6 @@
 import CoreBluetooth
 import HealthKit
+import LoopAlgorithm
 import LoopKit
 import UIKit
 import UserNotifications
@@ -18,11 +19,20 @@ public class DanaKitPumpManager: DeviceManager, @unchecked Sendable {
         state.rawValue
     }
 
-    public static let pluginIdentifier: String = "Dana" // use a single token to make parsing log files easier
+    public let pluginIdentifier: String = "Dana" // use a single token to make parsing log files easier
     public let managerIdentifier: String = "Dana"
 
     public var localizedTitle: String {
         state.getFriendlyDeviceName()
+    }
+
+    public var inSignalLoss: Bool {
+        (bluetooth is ContinousBluetoothManager && !bluetooth.isConnected) ||
+            (bluetooth is InteractiveBluetoothManager && Date.now.timeIntervalSince(state.lastStatusDate) > .minutes(12))
+    }
+
+    public var isInoperable: Bool {
+        false
     }
 
     init(state: DanaKitPumpManagerState, dateGenerator _: @escaping () -> Date = Date.init) {
@@ -188,15 +198,15 @@ public class DanaKitPumpManager: DeviceManager, @unchecked Sendable {
     }
 
     func setAlert(notification: DanaKitNotification) {
-        pumpDelegate.notify {
-            $0?.issueAlert(notification.alert)
+        Task {
+            await pumpDelegate.delegate?.issueAlert(notification.alert)
         }
     }
 
     func clearAlerts() {
-        pumpDelegate.notify {
-            $0?.retractAlert(identifier: DanaKitNotification.disconnectWarning.identifier)
-            $0?.retractAlert(identifier: DanaKitNotification.disconnectedReminder(after: .minutes(1)).identifier)
+        Task {
+            await pumpDelegate.delegate?.retractAlert(identifier: DanaKitNotification.disconnectWarning.identifier)
+            await pumpDelegate.delegate?.retractAlert(identifier: DanaKitNotification.disconnectedReminder(after: .minutes(1)).identifier)
         }
     }
 }
@@ -347,6 +357,7 @@ extension DanaKitPumpManager: PumpManager {
     }
 
     public func enactBolus(
+        decisionId _: UUID?,
         units: Double,
         activationType: BolusActivationType,
         completion: @escaping (PumpManagerError?) -> Void
@@ -470,7 +481,7 @@ extension DanaKitPumpManager: PumpManager {
 
     public func enactPrime(unit: Double, completion: @escaping (PumpManagerError?) -> Void) {
         isPriming = true
-        enactBolus(units: unit, activationType: .manualNoRecommendation) { error in
+        enactBolus(decisionId: nil, units: unit, activationType: .manualNoRecommendation) { error in
             self.isPriming = false
 
             if let error = error {
@@ -602,6 +613,7 @@ extension DanaKitPumpManager: PumpManager {
     }
 
     public func enactTempBasal(
+        decisionId _: UUID?,
         unitsPerHour: Double,
         for duration: TimeInterval,
         completion: @escaping (PumpManagerError?) -> Void
@@ -1252,12 +1264,12 @@ extension DanaKitPumpManager: PumpManager {
                         self.logDeviceCommunication("Delivery settings received!", type: .delegateResponse)
 
                         completion(.success(DeliveryLimits(
-                            maximumBasalRate: HKQuantity(
-                                unit: HKUnit.internationalUnit().unitDivided(by: .hour()),
+                            maximumBasalRate: LoopQuantity(
+                                unit: .internationalUnitsPerHour,
                                 doubleValue: basalData.maxBasal
                             ),
-                            maximumBolus: HKQuantity(
-                                unit: .internationalUnit(),
+                            maximumBolus: LoopQuantity(
+                                unit: .internationalUnit,
                                 doubleValue: bolusData.maxBolus
                             )
                         )))
@@ -1390,9 +1402,7 @@ extension DanaKitPumpManager: AlertSoundVendor {
 }
 
 public extension DanaKitPumpManager {
-    func acknowledgeAlert(alertIdentifier _: LoopKit.Alert.AlertIdentifier, completion: @escaping (Error?) -> Void) {
-        completion(nil)
-    }
+    func acknowledgeAlert(alertIdentifier _: LoopKit.Alert.AlertIdentifier) async throws {}
 }
 
 // MARK: State observers
@@ -1487,7 +1497,9 @@ public extension DanaKitPumpManager {
                 return
             }
 
-            delegate.issueAlert(loopAlert)
+            Task {
+                await delegate.issueAlert(loopAlert)
+            }
             delegate.pumpManager(
                 self,
                 hasNewPumpEvents: events,

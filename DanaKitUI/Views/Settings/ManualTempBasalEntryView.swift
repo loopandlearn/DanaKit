@@ -1,4 +1,4 @@
-import HealthKit
+import LoopAlgorithm
 import LoopKit
 import LoopKitUI
 import SwiftUI
@@ -33,7 +33,7 @@ struct ManualTempBasalEntryView: View {
     }
 
     private static let hourFormatter: QuantityFormatter = {
-        let quantityFormatter = QuantityFormatter(for: .hour())
+        let quantityFormatter = QuantityFormatter(for: .hour)
         quantityFormatter.numberFormatter.minimumFractionDigits = 0
         quantityFormatter.numberFormatter.maximumFractionDigits = 0
         quantityFormatter.unitStyle = .long
@@ -41,7 +41,7 @@ struct ManualTempBasalEntryView: View {
     }()
 
     private static let minuteFormatter: QuantityFormatter = {
-        let formatter = QuantityFormatter(for: .minute())
+        let formatter = QuantityFormatter(for: .minute)
         formatter.numberFormatter.minimumFractionDigits = 0
         formatter.numberFormatter.maximumFractionDigits = 0
         formatter.unitStyle = .long
@@ -51,10 +51,10 @@ struct ManualTempBasalEntryView: View {
     func formatDuration(_ duration: TimeInterval) -> String {
         if duration < TimeInterval.hours(1) {
             return ManualTempBasalEntryView.minuteFormatter
-                .string(from: HKQuantity(unit: .minute(), doubleValue: duration.minutes)) ?? ""
+                .string(from: LoopQuantity(unit: .minute, doubleValue: duration.minutes)) ?? ""
         } else {
             return ManualTempBasalEntryView.hourFormatter
-                .string(from: HKQuantity(unit: .hour(), doubleValue: duration.hours)) ?? ""
+                .string(from: LoopQuantity(unit: .hour, doubleValue: duration.hours)) ?? ""
         }
     }
 
@@ -79,21 +79,28 @@ struct ManualTempBasalEntryView: View {
                             )
                         }
                         HStack {
-                            ResizeablePicker(
-                                selection: $rateEntered,
-                                data: allowedRates,
-                                formatter: {
-                                    String(
-                                        format: String(localized: "%@ (%@ U/hr)", comment: "MTB rate"),
-                                        $0.formatted(.percent),
-                                        String(format: "%.2f", currentScheduledBasal * (Double($0) / 100))
-                                    ) }
-                            )
-                            ResizeablePicker(
-                                selection: $durationEntered,
-                                data: allowedDurations,
-                                formatter: { formatDuration($0) }
-                            )
+                            Picker(selection: $rateEntered) {
+                                ForEach(allowedRates, id: \.self) { rate in
+                                    Text(
+                                        String(
+                                            format: String(localized: "%@ (%@ U/hr)", comment: "MTB rate"),
+                                            rate.formatted(.percent),
+                                            String(format: "%.2f", currentScheduledBasal * (Double(rate) / 100))
+                                        )
+                                    )
+                                }
+                            } label: {
+                                EmptyView()
+                            }
+                            .pickerStyle(.wheel)
+                            Picker(selection: $durationEntered) {
+                                ForEach(allowedDurations, id: \.self) { duration in
+                                    Text(formatDuration(duration))
+                                }
+                            } label: {
+                                EmptyView()
+                            }
+                            .pickerStyle(.wheel)
                         }
                         .frame(maxHeight: 162.0)
                         .alert(isPresented: $showingMissingConfigAlert, content: { missingConfigAlert })

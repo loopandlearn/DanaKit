@@ -20,6 +20,7 @@ public extension DoseEntry {
             endDate: endTime,
             value: units,
             unit: .units,
+            decisionId: nil,
             deliveredUnits: deliveredUnits,
             insulinType: insulinType,
             automatic: activationType.isAutomatic,
@@ -45,6 +46,7 @@ public extension DoseEntry {
                 endDate: endDate,
                 value: absoluteUnit,
                 unit: .unitsPerHour,
+                decisionId: nil,
                 deliveredUnits: roundBasalRate(absoluteUnit * (duration / .hours(1))),
                 insulinType: insulinType,
                 automatic: automatic,
@@ -58,6 +60,7 @@ public extension DoseEntry {
             endDate: startDate + duration,
             value: absoluteUnit,
             unit: .unitsPerHour,
+            decisionId: nil,
             insulinType: insulinType,
             automatic: automatic,
             isMutable: true
@@ -70,6 +73,7 @@ public extension DoseEntry {
             startDate: startDate,
             value: rate,
             unit: .unitsPerHour,
+            decisionId: nil,
             insulinType: insulinType
         )
     }
