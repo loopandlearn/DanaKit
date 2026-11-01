@@ -205,8 +205,9 @@ public class DanaKitPumpManager: DeviceManager, @unchecked Sendable {
 
     func clearAlerts() {
         Task {
-            await pumpDelegate.delegate?.retractAlert(identifier: DanaKitNotification.disconnectWarning.identifier)
-            await pumpDelegate.delegate?.retractAlert(identifier: DanaKitNotification.disconnectedReminder(after: .minutes(1)).identifier)
+            for identifier in DanaKitNotification.retractableIdentifiers {
+                await pumpDelegate.delegate?.retractAlert(identifier: identifier)
+            }
         }
     }
 }

@@ -15,19 +15,28 @@ enum DanaKitNotification {
         )
     }
 
-    private static let managerIdentifier = "Medtrum"
+    private static let managerIdentifier = "Dana"
+    private static let legacyManagerIdentifier = "Medtrum"
+
+    static var retractableIdentifiers: [Alert.Identifier] {
+        [DanaKitNotification.disconnectWarning, .disconnectedReminder(after: 0)]
+            .flatMap { [$0.identifier, $0.legacyIdentifier] }
+    }
+
     var identifier: Alert.Identifier {
+        Alert.Identifier(managerIdentifier: Self.managerIdentifier, alertIdentifier: alertIdentifier)
+    }
+
+    var legacyIdentifier: Alert.Identifier {
+        Alert.Identifier(managerIdentifier: Self.legacyManagerIdentifier, alertIdentifier: alertIdentifier)
+    }
+
+    private var alertIdentifier: String {
         switch self {
         case .disconnectedReminder:
-            return Alert.Identifier(
-                managerIdentifier: Self.managerIdentifier,
-                alertIdentifier: "com.bastiaanv.continuous-ble.disconnect-reminder"
-            )
+            return "com.bastiaanv.continuous-ble.disconnect-reminder"
         case .disconnectWarning:
-            return Alert.Identifier(
-                managerIdentifier: Self.managerIdentifier,
-                alertIdentifier: "com.bastiaanv.continuous-ble.disconnect-warning"
-            )
+            return "com.bastiaanv.continuous-ble.disconnect-warning"
         }
     }
 
