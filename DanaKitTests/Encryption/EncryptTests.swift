@@ -2,6 +2,8 @@
 import Testing
 
 struct EncryptionTests {
+    private let encryption = DanaKitEncryption()
+
     @Test func testEncodePumpCheckCommand() {
         let param = EncryptParams(
             operationCode: DanaPacketType.OPCODE_ENCRYPTION__PUMP_CHECK,
@@ -12,7 +14,7 @@ struct EncryptionTests {
             passwordSecret: Data(),
             passKeySecret: Data()
         )
-        let result = encrypt(param)
+        let result = encryption.encrypt(param)
 
         #expect(result.isEncryptionMode)
         #expect(result.data == Data([165, 165, 12, 233, 243, 217, 162, 187, 191, 216, 195, 190, 218, 181, 198, 84, 137, 90, 90]))
@@ -28,7 +30,7 @@ struct EncryptionTests {
             passwordSecret: Data(),
             passKeySecret: Data()
         )
-        let result = encrypt(param)
+        let result = encryption.encrypt(param)
         #expect(result.isEncryptionMode)
         #expect(result.data == Data([165, 165, 6, 233, 242, 143, 232, 243, 143, 247, 28, 90, 90]))
     }
@@ -43,7 +45,7 @@ struct EncryptionTests {
             passwordSecret: Data(),
             passKeySecret: Data()
         )
-        let result = encrypt(param)
+        let result = encryption.encrypt(param)
         #expect(result.isEncryptionMode)
         #expect(result.data == Data([165, 165, 6, 233, 242, 143, 229, 226, 137, 183, 82, 90, 90]))
     }
@@ -58,7 +60,7 @@ struct EncryptionTests {
             passwordSecret: Data(),
             passKeySecret: Data()
         )
-        let result = encrypt(param)
+        let result = encryption.encrypt(param)
         #expect(result.isEncryptionMode)
         #expect(result.data == Data([165, 165, 2, 233, 242, 134, 120, 90, 90]))
     }
@@ -73,7 +75,7 @@ struct EncryptionTests {
             passwordSecret: Data(),
             passKeySecret: Data()
         )
-        let result = encrypt(param)
+        let result = encryption.encrypt(param)
         #expect(result.isEncryptionMode)
         #expect(result.data == Data([165, 165, 2, 233, 0, 81, 109, 90, 90]))
     }
@@ -88,7 +90,7 @@ struct EncryptionTests {
             passwordSecret: Data(),
             passKeySecret: Data()
         )
-        let result = encrypt(param)
+        let result = encryption.encrypt(param)
         #expect(result.isEncryptionMode)
         #expect(result.data == Data([165, 165, 2, 233, 7, 33, 82, 90, 90]))
     }
@@ -103,7 +105,7 @@ struct EncryptionTests {
             passwordSecret: Data(),
             passKeySecret: Data()
         )
-        let result = encrypt(param)
+        let result = encryption.encrypt(param)
         #expect(result.isEncryptionMode)
         #expect(result.data == Data([165, 165, 2, 233, 34, 80, 77, 90, 90]))
     }
@@ -118,7 +120,7 @@ struct EncryptionTests {
             passwordSecret: Data(),
             passKeySecret: Data()
         )
-        let result = encrypt(param)
+        let result = encryption.encrypt(param)
         #expect(result.isEncryptionMode)
         #expect(result.data == Data([165, 165, 4, 233, 35, 228, 128, 28, 180, 90, 90]))
     }
@@ -133,7 +135,7 @@ struct EncryptionTests {
             passwordSecret: Data(),
             passKeySecret: Data()
         )
-        let result = encrypt(param)
+        let result = encryption.encrypt(param)
         #expect(!result.isEncryptionMode)
         #expect(result.data == Data([165, 165, 4, 73, 147, 71, 233, 137, 149, 90, 90]))
     }
@@ -148,7 +150,7 @@ struct EncryptionTests {
             passwordSecret: Data(),
             passKeySecret: Data()
         )
-        let result = encrypt(param)
+        let result = encryption.encrypt(param)
         #expect(!result.isEncryptionMode)
         #expect(result.data == Data([165, 165, 2, 73, 241, 235, 35, 90, 90]))
     }
@@ -163,9 +165,9 @@ struct EncryptionTests {
         let pairingKey = Data([237, 241, 117, 95, 135, 61])
         let randomPairingKey = Data([181, 201, 65])
 
-        let randomSyncKey = initialRandomSyncKey(pairingKey: pairingKey)
+        let randomSyncKey = encryption.initialRandomSyncKey(pairingKey: pairingKey)
 
-        var params = EncryptSecondLevelParams(
+        var params = DanaKitEncryption.EncryptSecondLevelParams(
             buffer: data,
             enhancedEncryption: enhancedEncryption,
             pairingKey: pairingKey,
@@ -173,7 +175,7 @@ struct EncryptionTests {
             randomSyncKey: randomSyncKey,
             bleRandomKeys: Ble5Keys
         )
-        let result = encryptSecondLevel(&params)
+        let result = encryption.encryptSecondLevel(&params)
         #expect(result.randomSyncKey == 207)
         #expect(result.buffer == Data([19, 203, 1, 47, 8, 203, 194, 168, 207]))
     }
@@ -185,9 +187,9 @@ struct EncryptionTests {
         let pairingKey = Data([237, 241, 117, 95, 135, 61])
         let randomPairingKey = Data([181, 201, 65])
 
-        var randomSyncKey = initialRandomSyncKey(pairingKey: pairingKey)
+        var randomSyncKey = encryption.initialRandomSyncKey(pairingKey: pairingKey)
 
-        var paramsKeepConnection = EncryptSecondLevelParams(
+        var paramsKeepConnection = DanaKitEncryption.EncryptSecondLevelParams(
             buffer: dataKeepConnection,
             enhancedEncryption: enhancedEncryption,
             pairingKey: pairingKey,
@@ -195,7 +197,7 @@ struct EncryptionTests {
             randomSyncKey: randomSyncKey,
             bleRandomKeys: Ble5Keys
         )
-        let result = encryptSecondLevel(&paramsKeepConnection)
+        let result = encryption.encryptSecondLevel(&paramsKeepConnection)
         #expect(result.randomSyncKey == 207)
         #expect(result.buffer == Data([19, 203, 1, 47, 8, 203, 194, 168, 207]))
 
@@ -204,7 +206,7 @@ struct EncryptionTests {
         // Decrypt ETC__KEEP_CONNECTION
         let decryptKeepConnection = Data([83, 143, 118, 179, 100, 46, 5, 39, 50, 225])
 
-        var paramsDecryptKeepConnection = DecryptSecondLevelParams(
+        var paramsDecryptKeepConnection = DanaKitEncryption.DecryptSecondLevelParams(
             buffer: decryptKeepConnection,
             enhancedEncryption: enhancedEncryption,
             pairingKey: pairingKey,
@@ -212,7 +214,7 @@ struct EncryptionTests {
             randomSyncKey: randomSyncKey,
             bleRandomKeys: Ble5Keys
         )
-        let result2 = decryptSecondLevel(&paramsDecryptKeepConnection)
+        let result2 = encryption.decryptSecondLevel(&paramsDecryptKeepConnection)
         #expect(result2.randomSyncKey == 225)
         #expect(result2.buffer == Data([165, 165, 3, 82, 9, 136, 174, 2, 90, 90]))
 
@@ -221,7 +223,7 @@ struct EncryptionTests {
         // DANA_PACKET_TYPE.REVIEW__GET_SHIPPING_INFORMATION
         let dataGetShippingInformation = Data([165, 165, 2, 65, 214, 138, 205, 90, 90])
 
-        var paramsGetShippingInformation = EncryptSecondLevelParams(
+        var paramsGetShippingInformation = DanaKitEncryption.EncryptSecondLevelParams(
             buffer: dataGetShippingInformation,
             enhancedEncryption: enhancedEncryption,
             pairingKey: pairingKey,
@@ -229,7 +231,7 @@ struct EncryptionTests {
             randomSyncKey: randomSyncKey,
             bleRandomKeys: Ble5Keys
         )
-        let result3 = encryptSecondLevel(&paramsGetShippingInformation)
+        let result3 = encryption.encryptSecondLevel(&paramsGetShippingInformation)
         #expect(result3.randomSyncKey == 177)
         #expect(result3.buffer == Data([70, 81, 52, 121, 145, 240, 177, 76, 177]))
     }
@@ -240,7 +242,7 @@ struct EncryptionTests {
         let enhancedEncryption: UInt8 = 2
         let emptyKey = Data([])
 
-        var params = EncryptSecondLevelParams(
+        var params = DanaKitEncryption.EncryptSecondLevelParams(
             buffer: data,
             enhancedEncryption: enhancedEncryption,
             pairingKey: emptyKey,
@@ -248,7 +250,7 @@ struct EncryptionTests {
             randomSyncKey: 0,
             bleRandomKeys: Ble5Keys
         )
-        let result = encryptSecondLevel(&params)
+        let result = encryption.encryptSecondLevel(&params)
         #expect(result.randomSyncKey == 0)
         #expect(result.buffer == Data([126, 126, 235, 16, 154, 122, 245, 170, 170]))
     }

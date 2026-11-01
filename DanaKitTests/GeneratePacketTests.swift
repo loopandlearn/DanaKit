@@ -2,43 +2,43 @@
 import Testing
 
 @Suite struct GeneratePacketTests {
-    @Test func generateBasalCancelTemporary() {
-        let packet = generatePacketBasalCancelTemporary()
+    @Test func generateBasalCancelTemporary() throws {
+        let packet = DanaBasalCancelTemporary()
 
         #expect(packet.opCode == 98)
-        #expect(packet.data == nil)
+        #expect(try packet.generate() == Data())
     }
 
-    @Test func generateBasalGetProfileNumber() {
-        let packet = generatePacketBasalGetProfileNumber()
+    @Test func generateBasalGetProfileNumber() throws {
+        let packet = DanaBasalGetProfileNumber()
 
         #expect(packet.opCode == 101)
-        #expect(packet.data == nil)
+        #expect(try packet.generate() == Data())
     }
 
-    @Test func generateBasalGetRate() {
-        let packet = generatePacketBasalGetRate()
+    @Test func generateBasalGetRate() throws {
+        let packet = DanaBasalGetRate()
 
         #expect(packet.opCode == 103)
-        #expect(packet.data == nil)
+        #expect(try packet.generate() == Data())
     }
 
-    @Test func generateBasalSetProfileNumber() {
+    @Test func generateBasalSetProfileNumber() throws {
         let options = PacketBasalSetProfileNumber(profileNumber: 0)
-        let packet = generatePacketBasalSetProfileNumber(options: options)
+        let packet = DanaBasalSetProfileNumber(options: options)
 
         #expect(packet.opCode == 100)
-        #expect(packet.data == Data([0]))
+        #expect(try packet.generate() == Data([0]))
     }
 
     @Test func generateBasalSetProfileRate() throws {
         let profileBasalRate: [Double] = Array(repeating: 0.5, count: 24)
         let options = PacketBasalSetProfileRate(profileNumber: 0, profileBasalRate: profileBasalRate)
-        let packet = try generatePacketBasalSetProfileRate(options: options)
+        let packet = DanaBasalSetProfileRate(options: options)
 
         let expectedData = Data([0] + Array(repeating: [50, 0], count: 24).flatMap { $0 })
         #expect(packet.opCode == 102)
-        #expect(packet.data == expectedData)
+        #expect(try packet.generate() == expectedData)
     }
 
     @Test func generateBasalSetProfileRate_InvalidRateLength() {
@@ -50,71 +50,71 @@ import Testing
             code: 1,
             userInfo: [NSLocalizedDescriptionKey: "Invalid basal rate. Expected length = 24"]
         )
-        #expect(throws: expectedError) { try generatePacketBasalSetProfileRate(options: options) }
+        #expect(throws: expectedError) { try DanaBasalSetProfileRate(options: options).generate() }
     }
 
-    @Test func generateBasalSetSuspendOff() {
-        let packet = generatePacketBasalSetSuspendOff()
+    @Test func generateBasalSetSuspendOff() throws {
+        let packet = DanaBasalSetSuspendOff()
 
         #expect(packet.opCode == 106)
-        #expect(packet.data == nil)
+        #expect(try packet.generate() == Data())
     }
 
-    @Test func generateBasalSetSuspendOn() {
-        let packet = generatePacketBasalSetSuspendOn()
+    @Test func generateBasalSetSuspendOn() throws {
+        let packet = DanaBasalSetSuspendOn()
 
         #expect(packet.opCode == 105)
-        #expect(packet.data == nil)
+        #expect(try packet.generate() == Data())
     }
 
-    @Test func generateBasalSetTemporary() {
+    @Test func generateBasalSetTemporary() throws {
         let options = PacketBasalSetTemporary(temporaryBasalRatio: 200, temporaryBasalDuration: 1)
-        let packet = generatePacketBasalSetTemporary(options: options)
+        let packet = DanaBasalSetTemporary(options: options)
 
         #expect(packet.opCode == 96)
-        #expect(packet.data == Data([200, 1]))
+        #expect(try packet.generate() == Data([200, 1]))
     }
 
-    @Test func generateBolusCancelExtended() {
-        let packet = generatePacketBolusCancelExtended()
+    @Test func generateBolusCancelExtended() throws {
+        let packet = DanaBolusCancelExtended()
 
         #expect(packet.opCode == 73)
-        #expect(packet.data == nil)
+        #expect(try packet.generate() == Data())
     }
 
-    @Test func generateBolusGet24Circf() {
-        let packet = generatePacketBolusGet24CIRCFArray()
+    @Test func generateBolusGet24Circf() throws {
+        let packet = DanaBolusGet24CIRCFArray()
 
         #expect(packet.opCode == 82)
-        #expect(packet.data == nil)
+        #expect(try packet.generate() == Data())
     }
 
-    @Test func generateBolusGetCalculationInformation() {
-        let packet = generatePacketBolusGetCalculationInformation()
+    @Test func generateBolusGetCalculationInformation() throws {
+        let packet = DanaBolusGetCalculationInformation()
 
         #expect(packet.opCode == 75)
-        #expect(packet.data == nil)
+        #expect(try packet.generate() == Data())
     }
 
-    @Test func generateBolusGetCircf() {
-        let packet = generatePacketBolusGetCIRCFArray()
+    @Test func generateBolusGetCircf() throws {
+        let packet = DanaBolusGetCIRCFArray()
 
         #expect(packet.opCode == 78)
-        #expect(packet.data == nil)
+        #expect(try packet.generate() == Data())
     }
 
-    @Test func generateBolusGetOption() {
-        let packet = generatePacketBolusGetOption()
+    @Test func generateBolusGetOption() throws {
+        let packet = DanaBolusGetOption()
 
         #expect(packet.opCode == 80)
-        #expect(packet.data == nil)
+        #expect(try packet.generate() == Data())
     }
 
-    @Test func generateBolusGetStepOptionInformation() {
-        let packet = generatePacketBolusGetStepInformation()
+    @Test func generateBolusGetStepOptionInformation() throws {
+        let packet = DanaBolusGetStepInformation()
 
         #expect(packet.opCode == 64)
-        #expect(packet.data == nil)
+        #expect(try packet.generate() == Data())
     }
 
     @Test func generateBolusSet24Circf_mmolPerL() throws {
@@ -123,13 +123,13 @@ import Testing
             ic: Array(repeating: 0.5, count: 24),
             isf: Array(repeating: 1, count: 24)
         )
-        let packet = try generatePacketBolusSet24CIRCFArray(options: options)
+        let packet = DanaBolusSet24CIRCFArray(options: options)
 
         let expectedData = Data(
             Array(repeating: [1, 0], count: 24).flatMap { $0 } + Array(repeating: [100, 0], count: 24).flatMap { $0 }
         )
         #expect(packet.opCode == 83)
-        #expect(packet.data == expectedData)
+        #expect(try packet.generate() == expectedData)
     }
 
     @Test func generateBolusSet24Circf() throws {
@@ -138,11 +138,11 @@ import Testing
             ic: Array(repeating: 0.5, count: 24),
             isf: Array(repeating: 1, count: 24)
         )
-        let packet = try generatePacketBolusSet24CIRCFArray(options: options)
+        let packet = DanaBolusSet24CIRCFArray(options: options)
 
         let expectedData = Data(Array(repeating: [1, 0], count: 48).flatMap { $0 })
         #expect(packet.opCode == 83)
-        #expect(packet.data == expectedData)
+        #expect(try packet.generate() == expectedData)
     }
 
     @Test func generateBolusSet24Circf_InvalidInput() {
@@ -162,19 +162,19 @@ import Testing
             code: 1,
             userInfo: [NSLocalizedDescriptionKey: "Invalid length isf or ic"]
         )
-        #expect(throws: expectedError) { try generatePacketBolusSet24CIRCFArray(options: optionsInvalidIc) }
-        #expect(throws: expectedError) { try generatePacketBolusSet24CIRCFArray(options: optionsInvalidIsf) }
+        #expect(throws: expectedError) { try DanaBolusSet24CIRCFArray(options: optionsInvalidIc).generate() }
+        #expect(throws: expectedError) { try DanaBolusSet24CIRCFArray(options: optionsInvalidIsf).generate() }
     }
 
-    @Test func generateBolusSetExtended() {
+    @Test func generateBolusSetExtended() throws {
         let options = PacketBolusSetExtended(extendedAmount: 5, extendedDurationInHalfHours: 4)
-        let packet = generatePacketBolusSetExtended(options: options)
+        let packet = DanaBolusSetExtended(options: options)
 
         #expect(packet.opCode == 71)
-        #expect(packet.data == Data([5, 0, 4]))
+        #expect(try packet.generate() == Data([5, 0, 4]))
     }
 
-    @Test func generateBolusSetOption() {
+    @Test func generateBolusSetOption() throws {
         let options = PacketBolusSetOption(
             extendedBolusOptionOnOff: 0,
             bolusCalculationOption: 1,
@@ -196,174 +196,174 @@ import Testing
             missedBolus04EndHour: 0,
             missedBolus04EndMin: 0
         )
-        let packet = generatePacketBolusSetOption(options: options)
+        let packet = DanaBolusSetOption(options: options)
 
         #expect(packet.opCode == 81)
-        #expect(packet.data == Data([0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]))
+        #expect(try packet.generate() == Data([0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]))
     }
 
-    @Test func generateBolusStart_Speed12() {
+    @Test func generateBolusStart_Speed12() throws {
         let options = PacketBolusStart(amount: 5, speed: .speed12)
-        let packet = generatePacketBolusStart(options: options)
+        let packet = DanaBolusStart(options: options)
 
         #expect(packet.opCode == 74)
-        #expect(packet.data == Data([244, 1, 0]))
+        #expect(try packet.generate() == Data([244, 1, 0]))
     }
 
-    @Test func generateBolusStart_Speed30() {
+    @Test func generateBolusStart_Speed30() throws {
         let options = PacketBolusStart(amount: 5, speed: .speed30)
-        let packet = generatePacketBolusStart(options: options)
+        let packet = DanaBolusStart(options: options)
 
         #expect(packet.opCode == 74)
-        #expect(packet.data == Data([244, 1, 1]))
+        #expect(try packet.generate() == Data([244, 1, 1]))
     }
 
-    @Test func generateBolusStart_Speed60() {
+    @Test func generateBolusStart_Speed60() throws {
         let options = PacketBolusStart(amount: 5, speed: .speed60)
-        let packet = generatePacketBolusStart(options: options)
+        let packet = DanaBolusStart(options: options)
 
         #expect(packet.opCode == 74)
-        #expect(packet.data == Data([244, 1, 2]))
+        #expect(try packet.generate() == Data([244, 1, 2]))
     }
 
-    @Test func generateBolusStop() {
-        let packet = generatePacketBolusStop()
+    @Test func generateBolusStop() throws {
+        let packet = DanaBolusStop()
 
         #expect(packet.opCode == 68)
-        #expect(packet.data == nil)
+        #expect(try packet.generate() == Data())
     }
 
-    @Test func generateGeneralAvgBolus() {
-        let packet = generatePacketGeneralAvgBolus()
+    @Test func generateGeneralAvgBolus() throws {
+        let packet = DanaGeneralAvgBolus()
 
         #expect(packet.opCode == 16)
-        #expect(packet.data == nil)
+        #expect(try packet.generate() == Data())
     }
 
-    @Test func generateGeneralClearUserTimeChangeFlag() {
-        let packet = generatePacketGeneralClearUserTimeChangeFlag()
+    @Test func generateGeneralClearUserTimeChangeFlag() throws {
+        let packet = DanaGeneralClearUserTimeChangeFlag()
 
         #expect(packet.opCode == 35)
-        #expect(packet.data == nil)
+        #expect(try packet.generate() == Data())
     }
 
-    @Test func generateGeneralGetDecRatio() {
-        let packet = generatePacketGeneralGetPumpDecRatio()
+    @Test func generateGeneralGetDecRatio() throws {
+        let packet = DanaGeneralGetPumpDecRatio()
 
         #expect(packet.opCode == 128)
-        #expect(packet.data == nil)
+        #expect(try packet.generate() == Data())
     }
 
-    @Test func generateGeneralGetInitialScreenInformation() {
-        let packet = generatePacketGeneralGetInitialScreenInformation()
+    @Test func generateGeneralGetInitialScreenInformation() throws {
+        let packet = DanaGeneralGetInitialScreenInformation()
 
         #expect(packet.opCode == 2)
-        #expect(packet.data == nil)
+        #expect(try packet.generate() == Data())
     }
 
-    @Test func generateGeneralGetPumpCheck() {
-        let packet = generatePacketGeneralGetPumpCheck()
+    @Test func generateGeneralGetPumpCheck() throws {
+        let packet = DanaGeneralGetPumpCheck()
 
         #expect(packet.opCode == 33)
-        #expect(packet.data == nil)
+        #expect(try packet.generate() == Data())
     }
 
-    @Test func generateGeneralGetPumpTime() {
-        let packet = generatePacketGeneralGetPumpTime()
+    @Test func generateGeneralGetPumpTime() throws {
+        let packet = DanaGeneralGetPumpTime()
 
         #expect(packet.opCode == 112)
-        #expect(packet.data == nil)
+        #expect(try packet.generate() == Data())
     }
 
-    @Test func generateGeneralGetPumpTimeWithUtc() {
-        let packet = generatePacketGeneralGetPumpTimeUtcWithTimezone()
+    @Test func generateGeneralGetPumpTimeWithUtc() throws {
+        let packet = DanaGeneralGetPumpTimeUtcWithTimezone()
 
         #expect(packet.opCode == 120)
-        #expect(packet.data == nil)
+        #expect(try packet.generate() == Data())
     }
 
-    @Test func generateGeneralGetShippingInformation() {
-        let packet = generatePacketGeneralGetShippingInformation()
+    @Test func generateGeneralGetShippingInformation() throws {
+        let packet = DanaGeneralGetShippingInformation()
 
         #expect(packet.opCode == 32)
-        #expect(packet.data == nil)
+        #expect(try packet.generate() == Data())
     }
 
-    @Test func generateGeneralGetShippingVersion() {
-        let packet = generatePacketGeneralGetShippingVersion()
+    @Test func generateGeneralGetShippingVersion() throws {
+        let packet = DanaGeneralGetShippingVersion()
 
         #expect(packet.opCode == 129)
-        #expect(packet.data == nil)
+        #expect(try packet.generate() == Data())
     }
 
-    @Test func generateGeneralGetUserOption() {
-        let packet = generatePacketGeneralGetUserOption()
+    @Test func generateGeneralGetUserOption() throws {
+        let packet = DanaGeneralGetUserOption()
 
         #expect(packet.opCode == 114)
-        #expect(packet.data == nil)
+        #expect(try packet.generate() == Data())
     }
 
-    @Test func generateGeneralGetUserTimeChangeFlag() {
-        let packet = generatePacketGeneralGetUserTimeChangeFlag()
+    @Test func generateGeneralGetUserTimeChangeFlag() throws {
+        let packet = DanaGeneralGetUserTimeChangeFlag()
 
         #expect(packet.opCode == 34)
-        #expect(packet.data == nil)
+        #expect(try packet.generate() == Data())
     }
 
-    @Test func generateGeneralKeepConnection() {
-        let packet = generatePacketGeneralKeepConnection()
+    @Test func generateGeneralKeepConnection() throws {
+        let packet = DanaGeneralKeepConnection()
 
         #expect(packet.opCode == 255)
-        #expect(packet.data == nil)
+        #expect(try packet.generate() == Data())
     }
 
-    @Test func generateGeneralSaveHistory() {
+    @Test func generateGeneralSaveHistory() throws {
         let options = PacketGeneralSaveHistory(
             historyType: 1,
             historyDate: Date(timeIntervalSince1970: 1_701_774_000),
             historyCode: 1,
             historyValue: 1
         )
-        let packet = generatePacketGeneralSaveHistory(options: options)
+        let packet = DanaGeneralSaveHistory(options: options)
 
         #expect(packet.opCode == 224)
-        #expect(packet.data == Data([1, 23, 12, 5, 11, 0, 0, 1, 1, 0]))
+        #expect(try packet.generate() == Data([1, 23, 12, 5, 11, 0, 0, 1, 1, 0]))
     }
 
-    @Test func generateGeneralSetHistoryUploadMode_TurnOff() {
+    @Test func generateGeneralSetHistoryUploadMode_TurnOff() throws {
         let options = PacketGeneralSetHistoryUploadMode(mode: 0)
-        let packet = generatePacketGeneralSetHistoryUploadMode(options: options)
+        let packet = DanaGeneralSetHistoryUploadMode(options: options)
 
         #expect(packet.opCode == 37)
-        #expect(packet.data == Data([0]))
+        #expect(try packet.generate() == Data([0]))
     }
 
-    @Test func generateGeneralSetHistoryUploadMode_TurnOn() {
+    @Test func generateGeneralSetHistoryUploadMode_TurnOn() throws {
         let options = PacketGeneralSetHistoryUploadMode(mode: 1)
-        let packet = generatePacketGeneralSetHistoryUploadMode(options: options)
+        let packet = DanaGeneralSetHistoryUploadMode(options: options)
 
         #expect(packet.opCode == 37)
-        #expect(packet.data == Data([1]))
+        #expect(try packet.generate() == Data([1]))
     }
 
-    @Test func generateGeneralSetPumpTime() {
+    @Test func generateGeneralSetPumpTime() throws {
         // 2023-12-05T11:00:00.000 UTC
         let options = PacketGeneralSetPumpTime(time: Date(timeIntervalSince1970: 1_701_774_000))
-        let packet = generatePacketGeneralSetPumpTime(options: options)
+        let packet = DanaGeneralSetPumpTime(options: options)
 
         #expect(packet.opCode == 113)
-        #expect(packet.data == Data([23, 12, 5, 12, 0, 0]))
+        #expect(try packet.generate() == Data([23, 12, 5, 12, 0, 0]))
     }
 
-    @Test func generateGeneralSetPumpTimeWithTimezone() {
+    @Test func generateGeneralSetPumpTimeWithTimezone() throws {
         let options = PacketGeneralSetPumpTimeUtcWithTimezone(time: Date(timeIntervalSince1970: 1_701_774_000), zoneOffset: 1)
-        let packet = generatePacketGeneralSetPumpTimeUtcWithTimezone(options: options)
+        let packet = DanaGeneralSetPumpTimeUtcWithTimezone(options: options)
 
         #expect(packet.opCode == 121)
-        #expect(packet.data == Data([23, 12, 5, 11, 0, 0, 1]))
+        #expect(try packet.generate() == Data([23, 12, 5, 11, 0, 0, 1]))
     }
 
-    @Test func generateGeneralSetUserOption() {
+    @Test func generateGeneralSetUserOption() throws {
         let options = PacketGeneralSetUserOption(
             isTimeDisplay24H: true,
             isButtonScrollOnOff: true,
@@ -378,150 +378,150 @@ import Testing
             refillAmount: 7,
             targetBg: 55
         )
-        let packet = generatePacketGeneralSetUserOption(options: options)
+        let packet = DanaGeneralSetUserOption(options: options)
 
         #expect(packet.opCode == 115)
-        #expect(packet.data == Data([0, 1, 0, 10, 10, 1, 1, 0, 20, 250, 0, 7, 0, 55, 0]))
+        #expect(try packet.generate() == Data([0, 1, 0, 10, 10, 1, 1, 0, 20, 250, 0, 7, 0, 55, 0]))
     }
 
-    @Test func generateHistoryAlarmFromDate() {
+    @Test func generateHistoryAlarmFromDate() throws {
         let options = PacketHistoryBase(from: Date(timeIntervalSince1970: 1_701_774_000), usingUtc: true)
-        let packet = generatePacketHistoryAlarm(options: options)
+        let packet = DanaHistoryAlarm(options: options)
 
         #expect(packet.opCode == 25)
-        #expect(packet.data == Data([23, 12, 5, 11, 0, 0]))
+        #expect(try packet.generate() == Data([23, 12, 5, 11, 0, 0]))
     }
 
-    @Test func generateHistoryAlarm() {
+    @Test func generateHistoryAlarm() throws {
         let options = PacketHistoryBase(from: nil, usingUtc: true)
-        let packet = generatePacketHistoryAlarm(options: options)
+        let packet = DanaHistoryAlarm(options: options)
 
         #expect(packet.opCode == 25)
-        #expect(packet.data == Data([0, 1, 1, 0, 0, 0]))
+        #expect(try packet.generate() == Data([0, 1, 1, 0, 0, 0]))
     }
 
-    @Test func generateHistoryAll() {
+    @Test func generateHistoryAll() throws {
         let options = PacketHistoryBase(from: nil, usingUtc: true)
-        let packet = generatePacketHistoryAll(options: options)
+        let packet = DanaHistoryAll(options: options)
 
         #expect(packet.opCode == 31)
-        #expect(packet.data == Data([0, 1, 1, 0, 0, 0]))
+        #expect(try packet.generate() == Data([0, 1, 1, 0, 0, 0]))
     }
 
-    @Test func generateHistoryBasal() {
+    @Test func generateHistoryBasal() throws {
         let options = PacketHistoryBase(from: nil, usingUtc: true)
-        let packet = generatePacketHistoryBasal(options: options)
+        let packet = DanaHistoryBasal(options: options)
 
         #expect(packet.opCode == 26)
-        #expect(packet.data == Data([0, 1, 1, 0, 0, 0]))
+        #expect(try packet.generate() == Data([0, 1, 1, 0, 0, 0]))
     }
 
-    @Test func generateHistoryBloodGlucose() {
+    @Test func generateHistoryBloodGlucose() throws {
         let options = PacketHistoryBase(from: nil, usingUtc: true)
-        let packet = generatePacketHistoryBloodGlucose(options: options)
+        let packet = DanaHistoryBloodGlucose(options: options)
 
         #expect(packet.opCode == 21)
-        #expect(packet.data == Data([0, 1, 1, 0, 0, 0]))
+        #expect(try packet.generate() == Data([0, 1, 1, 0, 0, 0]))
     }
 
-    @Test func generateHistoryBolus() {
+    @Test func generateHistoryBolus() throws {
         let options = PacketHistoryBase(from: nil, usingUtc: true)
-        let packet = generatePacketHistoryBolus(options: options)
+        let packet = DanaHistoryBolus(options: options)
 
         #expect(packet.opCode == 17)
-        #expect(packet.data == Data([0, 1, 1, 0, 0, 0]))
+        #expect(try packet.generate() == Data([0, 1, 1, 0, 0, 0]))
     }
 
-    @Test func generateHistoryCarbohydrates() {
+    @Test func generateHistoryCarbohydrates() throws {
         let options = PacketHistoryBase(from: nil, usingUtc: true)
-        let packet = generatePacketHistoryCarbohydrates(options: options)
+        let packet = DanaHistoryCarbohydrates(options: options)
 
         #expect(packet.opCode == 22)
-        #expect(packet.data == Data([0, 1, 1, 0, 0, 0]))
+        #expect(try packet.generate() == Data([0, 1, 1, 0, 0, 0]))
     }
 
-    @Test func generateHistoryDaily() {
+    @Test func generateHistoryDaily() throws {
         let options = PacketHistoryBase(from: nil, usingUtc: true)
-        let packet = generatePacketHistoryDaily(options: options)
+        let packet = DanaHistoryDaily(options: options)
 
         #expect(packet.opCode == 18)
-        #expect(packet.data == Data([0, 1, 1, 0, 0, 0]))
+        #expect(try packet.generate() == Data([0, 1, 1, 0, 0, 0]))
     }
 
-    @Test func generateHistoryPrime() {
+    @Test func generateHistoryPrime() throws {
         let options = PacketHistoryBase(from: nil, usingUtc: true)
-        let packet = generatePacketHistoryPrime(options: options)
+        let packet = DanaHistoryPrime(options: options)
 
         #expect(packet.opCode == 19)
-        #expect(packet.data == Data([0, 1, 1, 0, 0, 0]))
+        #expect(try packet.generate() == Data([0, 1, 1, 0, 0, 0]))
     }
 
-    @Test func generateHistoryRefill() {
+    @Test func generateHistoryRefill() throws {
         let options = PacketHistoryBase(from: nil, usingUtc: true)
-        let packet = generatePacketHistoryRefill(options: options)
+        let packet = DanaHistoryRefill(options: options)
 
         #expect(packet.opCode == 20)
-        #expect(packet.data == Data([0, 1, 1, 0, 0, 0]))
+        #expect(try packet.generate() == Data([0, 1, 1, 0, 0, 0]))
     }
 
-    @Test func generateHistorySuspend() {
+    @Test func generateHistorySuspend() throws {
         let options = PacketHistoryBase(from: nil, usingUtc: true)
-        let packet = generatePacketHistorySuspend(options: options)
+        let packet = DanaHistorySuspend(options: options)
 
         #expect(packet.opCode == 24)
-        #expect(packet.data == Data([0, 1, 1, 0, 0, 0]))
+        #expect(try packet.generate() == Data([0, 1, 1, 0, 0, 0]))
     }
 
-    @Test func generateHistoryTemporary() {
+    @Test func generateHistoryTemporary() throws {
         let options = PacketHistoryBase(from: nil, usingUtc: true)
-        let packet = generatePacketHistoryTemporary(options: options)
+        let packet = DanaHistoryTemporary(options: options)
 
         #expect(packet.opCode == 23)
-        #expect(packet.data == Data([0, 1, 1, 0, 0, 0]))
+        #expect(try packet.generate() == Data([0, 1, 1, 0, 0, 0]))
     }
 
-    @Test func generateLoopHistoryEventsFromDateInUTC() {
-        let options = PacketLoopHistoryEvents(from: Date(timeIntervalSince1970: 1_701_774_000))
-        let packet = generatePacketLoopHistoryEvents(options: options)
+    @Test func generateLoopHistoryEventsFromDateInUTC() throws {
+        let options = PacketHistoryBase(from: Date(timeIntervalSince1970: 1_701_774_000), usingUtc: true)
+        let packet = DanaLoopHistoryEvents(options: options)
 
         #expect(packet.opCode == 194)
-        #expect(packet.data == Data([23, 12, 5, 11, 0, 0]))
+        #expect(try packet.generate() == Data([23, 12, 5, 11, 0, 0]))
     }
 
-    @Test func generateLoopHistoryEvents() {
-        let options = PacketLoopHistoryEvents(from: nil)
-        let packet = generatePacketLoopHistoryEvents(options: options)
+    @Test func generateLoopHistoryEvents() throws {
+        let options = PacketHistoryBase(from: nil, usingUtc: true)
+        let packet = DanaLoopHistoryEvents(options: options)
 
         #expect(packet.opCode == 194)
-        #expect(packet.data == Data([0, 1, 1, 0, 0, 0]))
+        #expect(try packet.generate() == Data([0, 1, 1, 0, 0, 0]))
     }
 
-    @Test func generateLoopSetHistoryEvent() {
+    @Test func generateLoopSetHistoryEvent() throws {
         let options = PacketLoopSetEventHistory(
             packetType: LoopHistoryEvents.carbs,
             time: Date(timeIntervalSince1970: 1_701_774_000),
             param1: 0,
             param2: 0
         )
-        let packet = generatePacketLoopSetEventHistory(options: options)
+        let packet = DanaLoopSetEventHistory(options: options)
 
         #expect(packet.opCode == 195)
-        #expect(packet.data == Data([14, 23, 12, 5, 11, 0, 0, 0, 0, 0, 0]))
+        #expect(try packet.generate() == Data([14, 23, 12, 5, 11, 0, 0, 0, 0, 0, 0]))
     }
 
-    @Test func generateLoopSetTemporaryBasal() {
+    @Test func generateLoopSetTemporaryBasal() throws {
         let options = PacketLoopSetTemporaryBasal(percent: 200, duration: .min30)
-        let packet = generatePacketLoopSetTemporaryBasal(options: options)
+        let packet = DanaLoopSetTemporaryBasal(options: options)
 
         #expect(packet.opCode == 193)
-        #expect(packet.data == Data([200, 0, 160]))
+        #expect(try packet.generate() == Data([200, 0, 160]))
     }
 
-    @Test func generateLoopSetTemporaryBasalPercentGreaterThan500() {
+    @Test func generateLoopSetTemporaryBasalPercentGreaterThan500() throws {
         let options = PacketLoopSetTemporaryBasal(percent: 750, duration: .min15)
-        let packet = generatePacketLoopSetTemporaryBasal(options: options)
+        let packet = DanaLoopSetTemporaryBasal(options: options)
 
         #expect(packet.opCode == 193)
-        #expect(packet.data == Data([244, 1, 150]))
+        #expect(try packet.generate() == Data([244, 1, 150]))
     }
 }

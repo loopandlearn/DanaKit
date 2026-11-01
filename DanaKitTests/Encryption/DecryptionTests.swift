@@ -2,8 +2,10 @@
 import Testing
 
 struct DecryptionTests {
+    private let encryption = DanaKitEncryption()
+
     @Test func testDecryptMessage() throws {
-        var params = DecryptParam(
+        var params = DanaKitEncryption.DecryptParam(
             data: Data([165, 165, 14, 234, 243, 192, 163, 190, 134, 184, 225, 185, 222, 197, 183, 222, 197, 31, 241, 90, 90]),
             deviceName: DEVICE_NAME,
             enhancedEncryption: 2,
@@ -17,7 +19,7 @@ struct DecryptionTests {
             passKeySecretBackup: Data([])
         )
 
-        let decryptionResult = try decrypt(&params)
+        let decryptionResult = try encryption.decrypt(&params)
 
         #expect(decryptionResult.isEncryptionMode)
         #expect(decryptionResult.passKeySecret == Data([]))
@@ -28,7 +30,7 @@ struct DecryptionTests {
     }
 
     @Test func testThrowIfLengthDoesNotMatch() {
-        var params = DecryptParam(
+        var params = DanaKitEncryption.DecryptParam(
             data: Data([165, 165, 17, 234, 243, 192, 163, 190, 134, 184, 225, 185, 222, 197, 183, 222, 197, 31, 241, 90, 90]),
             deviceName: DEVICE_NAME,
             enhancedEncryption: 2,
@@ -43,12 +45,12 @@ struct DecryptionTests {
         )
 
         #expect(throws: NSError(domain: "Package length does not match the length attr.", code: 0, userInfo: nil)) {
-            try decrypt(&params)
+            try encryption.decrypt(&params)
         }
     }
 
     @Test func testThrowIfCrcFails() {
-        var params = DecryptParam(
+        var params = DanaKitEncryption.DecryptParam(
             data: Data([165, 165, 14, 234, 243, 192, 163, 190, 134, 184, 225, 185, 222, 197, 183, 222, 197, 31, 21, 90, 90]),
             deviceName: DEVICE_NAME,
             enhancedEncryption: 2,
@@ -63,7 +65,7 @@ struct DecryptionTests {
         )
 
         #expect(throws: NSError(domain: "Crc checksum failed...", code: 0, userInfo: nil)) {
-            try decrypt(&params)
+            try encryption.decrypt(&params)
         }
     }
 }
