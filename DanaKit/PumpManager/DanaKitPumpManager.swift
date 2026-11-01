@@ -357,7 +357,7 @@ extension DanaKitPumpManager: PumpManager {
     }
 
     public func enactBolus(
-        decisionId _: UUID?,
+        decisionId: UUID?,
         units: Double,
         activationType: BolusActivationType,
         completion: @escaping (PumpManagerError?) -> Void
@@ -419,7 +419,8 @@ extension DanaKitPumpManager: PumpManager {
                             units: units,
                             duration: duration,
                             activationType: activationType,
-                            insulinType: self.state.insulinType
+                            insulinType: self.state.insulinType,
+                            decisionId: decisionId
                         )
 
                         self.doseReporter = DanaKitDoseProgressReporter(total: units)
@@ -609,11 +610,11 @@ extension DanaKitPumpManager: PumpManager {
             type: .delegate
         )
 
-        _enactTempBasal(percentage: percentage, for: duration, automatic: automatic, completion: completion)
+        _enactTempBasal(decisionId: nil, percentage: percentage, for: duration, automatic: automatic, completion: completion)
     }
 
     public func enactTempBasal(
-        decisionId _: UUID?,
+        decisionId: UUID?,
         unitsPerHour: Double,
         for duration: TimeInterval,
         completion: @escaping (PumpManagerError?) -> Void
@@ -640,7 +641,7 @@ extension DanaKitPumpManager: PumpManager {
             return
         }
 
-        _enactTempBasal(percentage: percentage, for: duration, automatic: true, completion: completion)
+        _enactTempBasal(decisionId: decisionId, percentage: percentage, for: duration, automatic: true, completion: completion)
     }
 
     /// NOTE: There are 2 ways to set a temp basal:
@@ -649,6 +650,7 @@ extension DanaKitPumpManager: PumpManager {
     /// Currently, this is implemented with a simpel U/hr -> % calculator
     /// NOTE: A temp basal >200% for 30 min (or full hour) is rescheduled to 15min
     private func _enactTempBasal(
+        decisionId: UUID?,
         percentage: UInt16,
         for duration: TimeInterval,
         automatic: Bool,
@@ -751,6 +753,7 @@ extension DanaKitPumpManager: PumpManager {
                             self.disconnect()
 
                             self.reportBasal(
+                                decisionId: decisionId,
                                 unitsPerHour: unitsPerHour,
                                 duration: duration,
                                 percentage: percentage,
@@ -783,6 +786,7 @@ extension DanaKitPumpManager: PumpManager {
                             }
 
                             self.reportBasal(
+                                decisionId: decisionId,
                                 unitsPerHour: unitsPerHour,
                                 duration: duration,
                                 percentage: percentage,
@@ -815,6 +819,7 @@ extension DanaKitPumpManager: PumpManager {
                             }
 
                             self.reportBasal(
+                                decisionId: decisionId,
                                 unitsPerHour: unitsPerHour,
                                 duration: duration,
                                 percentage: percentage,
@@ -852,6 +857,7 @@ extension DanaKitPumpManager: PumpManager {
                             }
 
                             self.reportBasal(
+                                decisionId: decisionId,
                                 unitsPerHour: unitsPerHour,
                                 duration: duration,
                                 percentage: percentage,
@@ -880,7 +886,14 @@ extension DanaKitPumpManager: PumpManager {
         }
     }
 
-    private func reportBasal(unitsPerHour: Double, duration: Double, percentage _: UInt16, isTempBasal: Bool, automatic: Bool) {
+    private func reportBasal(
+        decisionId: UUID?,
+        unitsPerHour: Double,
+        duration: Double,
+        percentage _: UInt16,
+        isTempBasal: Bool,
+        automatic: Bool
+    ) {
         var events: [NewPumpEvent] = []
         var basalDose: UnfinalizedDose
 
@@ -891,7 +904,8 @@ extension DanaKitPumpManager: PumpManager {
                 duration: duration,
                 insulinType: state.insulinType,
                 automatic: automatic,
-                startDate: startDate
+                startDate: startDate,
+                decisionId: decisionId
             )
             events.append(NewPumpEvent.tempBasal(
                 dose: basalDose.toDoseEntry(endDate: nil),

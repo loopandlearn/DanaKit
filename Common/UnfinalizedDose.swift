@@ -11,12 +11,14 @@ public class UnfinalizedDose: NSObject {
     public var deliveredUnits: Double = 0
     public let insulinType: InsulinType?
     public let automatic: Bool?
+    public let decisionId: UUID?
 
     public convenience init(
         units: Double,
         duration: TimeInterval,
         activationType: BolusActivationType,
-        insulinType: InsulinType?
+        insulinType: InsulinType?,
+        decisionId: UUID? = nil
     ) {
         self.init(
             type: .bolus,
@@ -25,7 +27,8 @@ public class UnfinalizedDose: NSObject {
             value: units,
             deliveredUnits: 0,
             insulinType: insulinType,
-            automatic: activationType.isAutomatic
+            automatic: activationType.isAutomatic,
+            decisionId: decisionId
         )
     }
 
@@ -70,7 +73,8 @@ public class UnfinalizedDose: NSObject {
         duration: TimeInterval,
         insulinType: InsulinType?,
         automatic: Bool,
-        startDate: Date = Date.now
+        startDate: Date = Date.now,
+        decisionId: UUID? = nil
     ) {
         self.init(
             type: .tempBasal,
@@ -79,7 +83,8 @@ public class UnfinalizedDose: NSObject {
             value: tempRate,
             deliveredUnits: 0,
             insulinType: insulinType,
-            automatic: automatic
+            automatic: automatic,
+            decisionId: decisionId
         )
     }
 
@@ -90,7 +95,8 @@ public class UnfinalizedDose: NSObject {
         value: Double,
         deliveredUnits: Double,
         insulinType: InsulinType?,
-        automatic: Bool?
+        automatic: Bool?,
+        decisionId: UUID? = nil
     ) {
         self.type = type
         self.startDate = startDate
@@ -99,6 +105,7 @@ public class UnfinalizedDose: NSObject {
         self.deliveredUnits = deliveredUnits
         self.insulinType = insulinType
         self.automatic = automatic
+        self.decisionId = decisionId
     }
 
     public func toDoseEntry(endDate: Date?) -> DoseEntry {
@@ -118,7 +125,7 @@ public class UnfinalizedDose: NSObject {
                 endDate: endDate,
                 value: value,
                 unit: .units,
-                decisionId: nil,
+                decisionId: decisionId,
                 deliveredUnits: isMutable ? nil : deliveredUnits,
                 insulinType: insulinType,
                 automatic: automatic,
@@ -152,7 +159,7 @@ public class UnfinalizedDose: NSObject {
                 endDate: actualEndDate,
                 value: value,
                 unit: .unitsPerHour,
-                decisionId: nil,
+                decisionId: decisionId,
                 deliveredUnits: isMutable ? nil : roundBasalRate(value * (duration / .hours(1))),
                 insulinType: insulinType,
                 automatic: automatic,
@@ -191,6 +198,7 @@ public class UnfinalizedDose: NSObject {
         let deliveredUnits = rawValue["deliveredUnits"] as? Double ?? 0
         let insulinType = (rawValue["insulinType"] as? InsulinType.RawValue).flatMap { InsulinType(rawValue: $0) }
         let automatic = rawValue["automatic"] as? Bool
+        let decisionId = (rawValue["decisionId"] as? String).flatMap { UUID(uuidString: $0) }
 
         self.init(
             type: type,
@@ -199,12 +207,13 @@ public class UnfinalizedDose: NSObject {
             value: value,
             deliveredUnits: deliveredUnits,
             insulinType: insulinType,
-            automatic: automatic
+            automatic: automatic,
+            decisionId: decisionId
         )
     }
 
     public var rawValue: RawValue {
-        [
+        var raw: RawValue = [
             "type": type.rawValue,
             "startDate": startDate,
             "expectedEndDate": expectedEndDate,
@@ -213,5 +222,7 @@ public class UnfinalizedDose: NSObject {
             "insulinType": insulinType?.rawValue as Any,
             "automatic": automatic as Any
         ]
+        raw["decisionId"] = decisionId?.uuidString
+        return raw
     }
 }
