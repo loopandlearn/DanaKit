@@ -1,4 +1,3 @@
-import LoopAlgorithm
 import LoopKit
 import LoopKitUI
 import SwiftUI

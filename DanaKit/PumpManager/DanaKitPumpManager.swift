@@ -1,6 +1,5 @@
 import CoreBluetooth
 import HealthKit
-import LoopAlgorithm
 import LoopKit
 import UIKit
 import UserNotifications
