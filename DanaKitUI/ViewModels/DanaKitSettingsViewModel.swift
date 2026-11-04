@@ -126,10 +126,9 @@ class DanaKitSettingsViewModel: ObservableObject {
     }
 
     func stopUsingDana() {
-        pumpManager.notifyDelegateOfDeactivation {
-            DispatchQueue.main.async {
-                self.didFinish?()
-            }
+        Task { @MainActor in
+            await pumpManager.delete()
+            self.didFinish?()
         }
     }
 

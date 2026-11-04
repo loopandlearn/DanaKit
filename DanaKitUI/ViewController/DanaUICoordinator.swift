@@ -277,10 +277,9 @@ class DanaUICoordinator: UINavigationController, @MainActor PumpManagerOnboardin
         if let nextStep = currentScreen.next() {
             navigateTo(nextStep)
         } else {
-            pumpManager.notifyDelegateOfDeactivation {
-                DispatchQueue.main.async {
-                    self.completionDelegate?.completionNotifyingDidComplete(self)
-                }
+            Task { @MainActor in
+                await pumpManager.delete()
+                self.completionDelegate?.completionNotifyingDidComplete(self)
             }
         }
     }
